@@ -16,29 +16,43 @@ class Coin(ABC):
     def __str__(self):
         return f"{self.name}*{self.count}"
 
-    def __add__(self, coin):
-        if not isinstance(coin, self.__class__):
+    def __add__(self, other):
+        if isinstance(other, int):
+            return self.__class__(
+                count=self.count + other
+            )
+
+        if not isinstance(other, self.__class__):
             raise TypeError(
-                f"unsupported operand type(s) for +: '{self.__class__.__name__}' and '{coin.__class__.__name__}'"
+                f"unsupported operand type(s) for +: '{self.__class__.__name__}' and '{other.__class__.__name__}'"
             )
 
         return self.__class__(
-            count=self.count + coin.count
+            count=self.count + other.count
         )
+
+    def __mul__(self, other):
+        if isinstance(other, int):
+            return self.__class__(
+                count=self.count * other
+            )
+        raise TypeError(
+            f"unsupported operand type(s) for +: '{self.__class__.__name__}' and '{other.__class__.__name__}'"
+        )
+
+
+class CrystalDiamond(Coin):
+    name = "晶钻"
+
+
+class Diamond(Coin):
+    name = "钻石"
 
 
 class StarDice(Coin):
     store_name = "神秘屋"
     name = "星谕骰"
     activity_name = "星谕罗盘"
-
-    def __init__(
-            self,
-            count: int = 1
-    ):
-        super().__init__(
-            count=count
-        )
 
 
 coin_map = {
