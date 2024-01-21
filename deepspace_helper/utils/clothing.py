@@ -27,7 +27,20 @@ class Clothing:
 
 def clothing_parser(
         clothing: Union[List, Dict]
-):
+) -> List[Clothing]:
+    """
+    Instantiate a `Clothing` object from either a `List` or `Dict`.
+
+    Parameters
+    ----------
+    clothing: Union[List, Dict]
+        Raw data of the clothing in either `List` or `Dict` format.
+
+    Returns
+    -------
+    List[Clothing]
+        A list containing the instantiated `Clothing` objects.
+    """
     if isinstance(clothing, Dict):
         clothing = [clothing]
 
@@ -35,13 +48,14 @@ def clothing_parser(
     for c in clothing:
         if "price" in c:
             p = c["price"]
-            price = coin_map[p["name"]](p["count"])
+            price = coin_map[p["name"]](p["value"])
             c["price"] = price
         result.append(Clothing(**c))
 
     return result
 
 
+# 自动从衣服文件夹里加载所有衣服
 _clothing_root = Path(f"{os.path.dirname(__file__)}/game_data/clothing")
 all_clothing = {
     clo_file.stem: clothing_parser(

@@ -28,7 +28,20 @@ class Card:
 
 def card_parser(
         cards: Union[List, Dict]
-):
+) -> List[Card]:
+    """
+    Instantiate a `Card` object from either a `List` or `Dict`.
+
+    Parameters
+    ----------
+    cards: Union[List, Dict]
+        Raw data of the card in either `List` or `Dict` format.
+
+    Returns
+    -------
+    List[Card]
+        A list containing the instantiated `Card` objects.
+    """
     if isinstance(cards, Dict):
         cards = [cards]
 
@@ -36,13 +49,14 @@ def card_parser(
     for c in cards:
         if "price" in c:
             p = c["price"]
-            price = coin_map[p["name"]](p["count"])
+            price = coin_map[p["name"]](p["value"])
             c["price"] = price
         result.append(Card(**c))
 
     return result
 
 
+# 自动从卡牌文件夹里加载所有卡牌
 _card_root = Path(f"{os.path.dirname(__file__)}/game_data/card")
 all_cards = {
     clo_file.stem: card_parser(

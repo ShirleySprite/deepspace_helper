@@ -5,7 +5,7 @@
     "name": "漉漉温言",
     "price": {
       "name": "StarDice",
-      "count": 880
+      "value": 880
     }
   },
   {
@@ -14,7 +14,7 @@
     "name": "余冽",
     "price": {
       "name": "StarDice",
-      "count": 880
+      "value": 880
     }
   },
   {
@@ -23,7 +23,7 @@
     "name": "潮夜陷落",
     "price": {
       "name": "StarDice",
-      "count": 880
+      "value": 880
     }
   }
 ]
