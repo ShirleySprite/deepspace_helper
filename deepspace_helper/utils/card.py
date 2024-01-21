@@ -20,10 +20,10 @@ class Card:
     def __hash__(self):
         return hash(str(self))
 
-    def __eq__(self, card):
-        if not isinstance(card, self.__class__):
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
             return False
-        return str(self) == str(card)
+        return str(self) == str(other)
 
 
 def card_parser(

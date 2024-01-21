@@ -19,10 +19,10 @@ class Clothing:
     def __hash__(self):
         return hash(str(self))
 
-    def __eq__(self, clothing):
-        if not isinstance(clothing, self.__class__):
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
             return False
-        return str(self) == str(clothing)
+        return str(self) == str(other)
 
 
 def clothing_parser(

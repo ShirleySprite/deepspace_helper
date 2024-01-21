@@ -16,6 +16,14 @@ class Coin(ABC):
     def __str__(self):
         return f"{self.name}*{self.value}"
 
+    def __hash__(self):
+        return hash(f"{self.name}{self.value}")
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.value == other.value
+
     def __add__(self, other):
         if isinstance(other, int):
             return self.__class__(
@@ -44,9 +52,23 @@ class Coin(ABC):
 class CrystalDiamond(Coin):
     name = "晶钻"
 
+    def evaluate_by_diamond(
+            self
+    ):
+        return CrystalDiamond(
+            value=round(self.value * 2.25)
+        )
+
 
 class Diamond(Coin):
     name = "钻石"
+
+    def evaluate_by_crystal_diamond(
+            self
+    ):
+        return CrystalDiamond(
+            value=round(self.value / 2.25)
+        )
 
 
 class StarDice(Coin):
