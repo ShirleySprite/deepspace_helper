@@ -15,6 +15,9 @@ class SlotMachine:
         self.rng = np.random.default_rng()
         self.record = Counter()
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(chance_table={self.chance_table})"
+
     def __call__(
             self,
             times: int = 1

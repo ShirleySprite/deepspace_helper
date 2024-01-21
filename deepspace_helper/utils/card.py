@@ -20,6 +20,11 @@ class Card:
     def __hash__(self):
         return hash(str(self))
 
+    def __eq__(self, card):
+        if not isinstance(card, self.__class__):
+            return False
+        return str(self) == str(card)
+
 
 def card_parser(
         cards: Union[List, Dict]

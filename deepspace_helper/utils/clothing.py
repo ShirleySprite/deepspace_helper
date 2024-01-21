@@ -19,6 +19,11 @@ class Clothing:
     def __hash__(self):
         return hash(str(self))
 
+    def __eq__(self, clothing):
+        if not isinstance(clothing, self.__class__):
+            return False
+        return str(self) == str(clothing)
+
 
 def clothing_parser(
         clothing: Union[List, Dict]
