@@ -39,3 +39,8 @@ class StarDice(Coin):
         super().__init__(
             count=count
         )
+
+
+coin_map = {
+    "StarDice": StarDice
+}
