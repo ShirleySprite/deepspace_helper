@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from deepspace_helper.sm_simulator.coin import Coin, StarDice
+from deepspace_helper.utils.coin import Coin, StarDice
 
 
 @dataclass
