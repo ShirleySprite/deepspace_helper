@@ -103,7 +103,27 @@ class Analyzer:
             target: Dict,
             step: int = 10,
             n_samples: int = 1000
-    ):
+    ) -> pd.DataFrame:
+        """
+        Simulate rolling the slot machine until reaching the specified `target`.
+        In a single experiment, results are accumulated every `step` spins.
+
+        Parameters
+        ----------
+        target : Dict
+            A dictionary representing the target configuration to achieve. The keys
+            are the items on the slot machine, and the values are the desired counts
+            for each item.
+        step : int, default: 10
+            The number of spins to accumulate results before checking for the target.
+        n_samples : int, default 1000
+            The number of simulation samples to run.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing the results of the slot machine simulations.
+        """
 
         def _roll(
                 machine,
@@ -137,6 +157,28 @@ class Analyzer:
             init_value: int = 10,
             n_samples: int = 1000
     ) -> pd.DataFrame:
+        """
+        Simulate rolling the slot machine until reaching the specified `target`.
+        In a single experiment, binary search is used. It returns the value k when
+        the `target` is satisfied in the kth trial but not in the (k-1)th trial.
+
+        Parameters
+        ----------
+        target : Dict
+            A dictionary representing the target configuration to achieve. The keys
+            are the items on the slot machine, and the values are the desired counts
+            for each item.
+        init_value : int, default: 10
+            The initial value for binary search.
+        n_samples : int, default 1000
+            The number of simulation samples to run.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing the results of the slot machine simulations.
+        """
+
         def _roll(
                 machine,
                 target_list,
