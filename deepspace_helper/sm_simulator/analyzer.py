@@ -1,5 +1,6 @@
+import math
 from collections import Counter
-from typing import Any, Dict
+from typing import Dict
 
 import pandas as pd
 
@@ -14,13 +15,18 @@ class Analyzer:
         self.slot_machine = slot_machine
 
     @staticmethod
-    def sample_df(
-            sample_list
-    ):
-        sample_df = pd.DataFrame(sample_list).fillna(0).astype(int)
-        cols = sorted(sample_df.columns, key=lambda x: str(x))
+    def _multi_experiment(n_repeat, func):
+        def wrapper(*args, **kwargs):
+            exp_result = []
+            for _ in range(n_repeat):
+                exp_result.append(func(*args, **kwargs))
 
-        return sample_df.reindex(columns=cols)
+            sample_df = pd.DataFrame(exp_result).fillna(0).astype(int)
+            cols = sorted(sample_df.columns, key=lambda x: str(x))
+
+            return sample_df.reindex(columns=cols)
+
+        return wrapper
 
     def roll_by_coins(
             self,
@@ -42,55 +48,138 @@ class Analyzer:
         pd.DataFrame
             A DataFrame containing the results of the slot machine simulations.
         """
-        sm = self.slot_machine
-        times = n_coins // sm.per_cost.value
-        exp_result = []
-        for _ in range(n_samples):
-            sm(
-                times=times
+
+        def _roll(
+                machine,
+                n
+        ):
+            machine.initialize()
+            machine(
+                times=n
             )
-            exp_result.append(sm.record)
-            sm.initialize()
+            rec = machine.record
+            rec["total_cost"] = machine.total_cost.value
+            return rec
 
-        sample_df = self.sample_df(exp_result)
-        sample_df["total_cost"] = sm.per_cost.value * times
+        sm = self.slot_machine
 
-        return sample_df
-    #
-    # @staticmethod
-    # def is_get(
-    #         target_item: Any,
-    #         target_cnt: int,
-    #         record: Counter
-    # ):
-    #     left = target_cnt - record[target_item]
-    #     if left <= 0:
-    #         return True
-    #
-    #     if hasattr(target_item, "price"):
-    #         pri = target_item.price
-    #         coins = record[pri.__class__(1)]
-    #         coins_left = coins - pri.value * target_cnt
-    #         if coins_left >= 0:
-    #             return True
-    #
-    #     return False
-    #
-    # def roll_by_target(
-    #         self,
-    #         target: Dict,
-    #         step: int = 10,
-    #         n_samples: int = 1000
-    # ) -> pd.DataFrame:
-    #     target = Counter(target)
-    #
-    #     is_get = False
-    #     sm = self.slot_machine
-    #     while not is_get:
-    #         sm(
-    #             times=step
-    #         )
-    #         rec = sm.record
-    #
-    #         for k, v in target.items():
-    #             if
+        return self._multi_experiment(
+            n_repeat=n_samples,
+            func=_roll
+        )(
+            machine=sm,
+            n=n_coins // sm.per_cost.value
+        )
+
+    @staticmethod
+    def _equivalent_target_list(
+            target: Dict
+    ):
+        def _equivalent(
+                tar
+        ):
+            result = [tar]
+            for k, v in tar.items():
+                if hasattr(k, "price"):
+                    pri = k.price
+                    equ_target = Counter(tar)
+                    equ_target -= Counter([k])
+                    equ_target[pri.__class__(1)] += pri.value
+
+                    if equ_target in rec:
+                        continue
+                    rec.append(equ_target)
+
+                    result.extend(_equivalent(equ_target))
+
+            return result
+
+        rec = []
+
+        return _equivalent(Counter(target))
+
+    def roll_by_target_naive(
+            self,
+            target: Dict,
+            step: int = 10,
+            n_samples: int = 1000
+    ):
+
+        def _roll(
+                machine,
+                target_list,
+                n
+        ):
+            machine.initialize()
+            for _ in range(10000):
+                machine(n)
+                rec = machine.record
+                for t in target_list:
+                    if not (t - rec):
+                        rec["total_cost"] = machine.total_cost.value
+                        return rec
+
+        sm = self.slot_machine
+        options = self._equivalent_target_list(target)
+
+        return self._multi_experiment(
+            n_repeat=n_samples,
+            func=_roll
+        )(
+            machine=sm,
+            target_list=options,
+            n=step
+        )
+
+    def roll_by_target_bin(
+            self,
+            target: Dict,
+            init_value: int = 10,
+            n_samples: int = 1000
+    ) -> pd.DataFrame:
+        def _roll(
+                machine,
+                target_list,
+                init
+        ):
+            latest_rec = machine.record
+            lower = 0
+            upper = math.inf
+            cur_times = init
+            for _ in range(100):
+                machine.initialize()
+                machine(cur_times)
+
+                is_get = False
+                rec = machine.record
+                rec["total_cost"] = machine.total_cost.value
+                for t in target_list:
+                    if not (t - rec):
+                        is_get = True
+                        break
+
+                if is_get:
+                    upper = cur_times
+                    latest_rec = rec
+                else:
+                    lower = cur_times
+
+                if upper != math.inf:
+                    cur_times = round((lower + upper) / 2)
+                else:
+                    cur_times = 2 * lower
+
+                if upper - lower == 1:
+                    return latest_rec
+
+        sm = self.slot_machine
+        options = self._equivalent_target_list(target)
+
+        return self._multi_experiment(
+            n_repeat=n_samples,
+            func=_roll
+        )(
+            machine=sm,
+            target_list=options,
+            init=init_value
+        )
