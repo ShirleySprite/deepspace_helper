@@ -39,6 +39,9 @@ class Coin(ABC):
             value=self.value + other.value
         )
 
+    def __radd__(self, other):
+        return self.__add__(other)
+
     def __mul__(self, other):
         if isinstance(other, int):
             return self.__class__(
@@ -47,6 +50,9 @@ class Coin(ABC):
         raise TypeError(
             f"unsupported operand type(s) for +: '{self.__class__.__name__}' and '{other.__class__.__name__}'"
         )
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
 
 
 class CrystalDiamond(Coin):
