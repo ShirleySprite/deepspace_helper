@@ -15,11 +15,12 @@ setup(
     include_package_data=True,
     install_requires=[
         "numpy ~= 1.26.3",
-        "pandas ~= 2.2.0"
+        "pandas ~= 2.2.0",
+        "seaborn ~= 0.13.1"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.9',
+    python_requires='>=3.10',
 )
