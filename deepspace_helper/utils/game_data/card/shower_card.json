@@ -1,0 +1,29 @@
+[
+  {
+    "rarity": 4,
+    "character": "沈星回",
+    "name": "漉漉温言",
+    "price": {
+      "name": "StarDice",
+      "value": 880
+    }
+  },
+  {
+    "rarity": 4,
+    "character": "黎深",
+    "name": "余冽",
+    "price": {
+      "name": "StarDice",
+      "value": 880
+    }
+  },
+  {
+    "rarity": 4,
+    "character": "祁煜",
+    "name": "潮夜陷落",
+    "price": {
+      "name": "StarDice",
+      "value": 880
+    }
+  }
+]

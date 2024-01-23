@@ -1,0 +1,26 @@
+[
+  {
+    "position": "头饰",
+    "name": "童趣小鸭",
+    "price": {
+      "name": "StarDice",
+      "value": 100
+    }
+  },
+  {
+    "position": "头饰",
+    "name": "竹蜻蜓",
+    "price": {
+      "name": "StarDice",
+      "value": 100
+    }
+  },
+  {
+    "position": "头饰",
+    "name": "黄金尖角",
+    "price": {
+      "name": "StarDice",
+      "value": 100
+    }
+  }
+]
