@@ -129,7 +129,7 @@ fig.savefig('star_dice_hist.png')
 
 从直方图中可以看出平均值为1900左右，即投入10000钻石可平均获得1900星谕骰。
 
-![star_dice_hist](D:\sprite\PythonProject\deepspace\deepspace_helper\star_dice_hist.png)
+![coins_hist](https://raw.githubusercontent.com/ShirleySprite/picgo_imgs/master/picgo/coins_hist.png)
 
 
 
@@ -166,4 +166,4 @@ fig.savefig('total_cost_hist.png')
 
 可以看出这是一个多峰分布，它的平均值是上面计算出的10389。
 
-![total_cost_hist](D:\sprite\PythonProject\deepspace\deepspace_helper\total_cost_hist.png)
+![total_hist](https://raw.githubusercontent.com/ShirleySprite/picgo_imgs/master/picgo/total_hist.png)
