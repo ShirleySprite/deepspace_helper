@@ -4,6 +4,14 @@
 
 
 
+## 0. 导入
+
+~~~python
+from deepspace_helper import Card, Clothing, StarDice, Diamond, all_cards, all_clothing, StarDice, Diamond, StarCompass, Analyzer
+~~~
+
+
+
 ## 1. 一些基础类
 
 目前货币仅实现了加法和乘法。
@@ -62,33 +70,27 @@ chance_table = {
     sd_5: 0.15
 }
 
-sm = SlotMachine(per_cost=Diamond(100), chance_table=chance_table)
+sc = StarCompass(per_cost=Diamond(100), chance_table=chance_table)
 ~~~
 
-老虎机是一个可调用对象，调用时可指定抽奖次数。
+`sc`是一个可调用对象，调用时可指定抽奖次数。
 
-`record`属性是汇总过后的总获奖记录。
+`record`属性是汇总过后的总获奖记录，一维数组，每个元素代表第n个人的记录。
 
 ~~~python
-sm(10)
-print(sm.record)
+sc(10)
+print(sc.record)
 """
-Counter(
-    {
-        StarDice(value=1): 2175, 
-        Clothing(position='头饰', name='竹蜻蜓', price=StarDice(value=100)): 2,
-        Clothing(position='头饰', name='黄金尖角', price=StarDice(value=100)): 1
-    }
-)
+[Counter({StarDice(value=1): 330})]
 """
 ~~~
 
 使用`.initialize()`方法初始化老虎机
 
 ~~~python
-sm.initialize()
-print(sm.record)
-# Counter()
+sc.initialize()
+print(sc.record)
+# [Counter()]
 ~~~
 
 
@@ -100,7 +102,7 @@ print(sm.record)
 ~~~python
 # 实例化分析器
 ana = Analyzer(
-    slot_machine=sm
+    slot_machine=sc
 )
 ~~~
 
@@ -109,23 +111,25 @@ ana = Analyzer(
 ## 3.1 按给定投入实验
 
 ~~~python
+import matplotlib.pyplot as plt
+
 n_samples = 1000
 result_df = ana.roll_by_coins(10000, n_samples=n_samples)
 
 # 查看出货概率
 sxh_ratio = len(result_df[result_df[sxh_shower_card] >= 1]) / n_samples
 print("沈星回:", sxh_ratio)
-# 沈星回: 0.281
+# 沈星回: 0.293
 
 # 画图
 fig, ax = plt.subplots()
-result_df[StarDice(1)].hist(ax=ax)
+result_df[StarDice(1)].hist(ax=ax, bins=100)
 fig.savefig('star_dice_hist.png')
 ~~~
 
-从正态分布图中可以看出平均值为1800左右，即投入10000钻石可平均获得1800星谕骰。
+从直方图中可以看出平均值为1900左右，即投入10000钻石可平均获得1900星谕骰。
 
-![star_dice_hist](https://raw.githubusercontent.com/ShirleySprite/picgo_imgs/master/picgo/star_dice_hist.png)
+![star_dice_hist](D:\sprite\PythonProject\deepspace\deepspace_helper\star_dice_hist.png)
 
 
 
@@ -146,29 +150,20 @@ target = {
 # 朴素计算
 naive_result = ana.roll_by_target_naive(
     target,
-    step=10,
-    n_samples=1000
+    step=1,
+    n_samples=10000
 )
 print("naive_result", naive_result["total_cost"].mean())
-# naive_result 10854.0
-
-# 二分计算
-bin_result = ana.roll_by_target_bin(
-    target,
-    n_samples=1000
-)
-
-print("bin_search:", bin_result["total_cost"].mean())
-# bin_search: 10284.3
+# naive_result 10389.29
 ~~~
 
 ~~~python
 # 画图
 fig, ax = plt.subplots()
-bin_result["total_cost"].hist(ax=ax)
+naive_result["total_cost"].hist(ax=ax)
 fig.savefig('total_cost_hist.png')
 ~~~
 
-从正态分布图中可以看出平均值为10000左右，即投入10000钻石可达成三种卡个1张的目标。
+可以看出这是一个多峰分布，它的平均值是上面计算出的10389。
 
-![total_cost_hist](https://raw.githubusercontent.com/ShirleySprite/picgo_imgs/master/picgo/total_cost_hist.png)
+![total_cost_hist](D:\sprite\PythonProject\deepspace\deepspace_helper\total_cost_hist.png)
