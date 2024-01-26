@@ -54,6 +54,22 @@ class Coin(ABC):
     def __rmul__(self, other):
         return self.__mul__(other)
 
+    def __lt__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'>' not supported between instances of '{self.__class__.__name__}' and '{other.__class__.__name__}'"
+            )
+
+        return self.value < other.value
+
+    def __gt__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'>' not supported between instances of '{self.__class__.__name__}' and '{other.__class__.__name__}'"
+            )
+
+        return self.value > other.value
+
 
 class CrystalDiamond(Coin):
     name = "晶钻"

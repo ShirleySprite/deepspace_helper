@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Dict
+from typing import Dict, Union, Tuple, List
 
 import numpy as np
 
@@ -27,7 +27,7 @@ class SlotMachine:
 
         # 记录次数和获得物品
         self.cnt = 0
-        self._raw_record = Counter()
+        self._raw_record = np.array([Counter()])
 
     @property
     def total_cost(
@@ -38,14 +38,17 @@ class SlotMachine:
     @property
     def record(
             self
-    ):
+    ) -> List:
         # coin应该合并, 其余保持不变
-        result = Counter()
-        for k, v in self._raw_record.items():
-            if isinstance(k, Coin):
-                result[k.__class__(1)] += k.value * v
-            else:
-                result[k] = v
+        result = []
+        for cnt in self._raw_record:
+            single_result = Counter()
+            for k, v in cnt.items():
+                if isinstance(k, Coin):
+                    single_result[k.__class__(1)] += k.value * v
+                else:
+                    single_result[k] = v
+            result.append(single_result)
 
         return result
 
@@ -56,16 +59,20 @@ class SlotMachine:
 
     def __call__(
             self,
-            times: int = 1
+            size: Union[int, Tuple[int, int]] = 1
     ):
+        if isinstance(size, int):
+            size = (1, size)
+
         result = self.rng.choice(
             self._items,
-            size=times,
+            size=size,
             p=self._weights
         )
+        result_cnt = np.array([Counter(x) for x in result])
 
-        self.cnt += times
-        self._raw_record += Counter(result)
+        self.cnt += size[1]
+        self._raw_record = self._raw_record + result_cnt
 
     def initialize(
             self
@@ -78,7 +85,7 @@ class SlotMachine:
         None
         """
         self.cnt = 0
-        self._raw_record = Counter()
+        self._raw_record = np.array([Counter()])
 
 
 class StarCompass(SlotMachine):
@@ -87,27 +94,28 @@ class StarCompass(SlotMachine):
     @property
     def record(
             self
-    ):
+    ) -> List:
         temp_result = super().record
+        new_result = []
+        for single_result in temp_result:
+            new_single = Counter()
+            for k, v in single_result.items():
+                # 衣服会转化为代币
+                if isinstance(k, Clothing):
+                    overflow = v - 1
+                    new_single[k] = 1
+                    new_single[StarDice(1)] += overflow * 80
 
-        result = Counter()
-        for k, v in temp_result.items():
-            # 衣服会转化为代币
-            if isinstance(k, Clothing):
-                overflow = v - 1
-                result[k] = 1
-                result[StarDice(1)] += overflow * 80
-
-            # 卡满破也会转化为代币
-            elif isinstance(k, Card):
-                overflow = max(0, v - 4)
-                result[k] = min(v, 4)
-                result[StarDice(1)] += overflow * 704
-
-            else:
-                result[k] += v
+                # 卡满破也会转化为代币
+                elif isinstance(k, Card):
+                    overflow = max(0, v - 4)
+                    new_single[k] = min(v, 4)
+                    new_single[StarDice(1)] += overflow * 704
+                else:
+                    new_single[k] += v
+            new_result.append(new_single)
 
         # 达到一定次数给蚊子腿
         ...
 
-        return result
+        return new_result
